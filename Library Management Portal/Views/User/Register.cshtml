@@ -1,0 +1,50 @@
+﻿@model Library_Management_Portal.Models.userModel
+
+
+
+
+@using (Html.BeginForm())
+{
+    <div class="form-border">
+        <h2>Register Here !!</h2>
+        <div>
+            @Html.LabelFor(m => m.Username, htmlAttributes: new { @class = "form-label" })
+            @Html.TextBoxFor(m => m.Username, new { @class = "form-control", placeholder = "Enter Username", required = "required" })
+        </div>
+
+        <div>
+            @Html.LabelFor(m => m.Password, htmlAttributes: new { @class = "form-label" })
+            @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Enter Password", required = "required" })
+        </div>
+
+        <div>
+            @Html.LabelFor(m => m.Email, htmlAttributes: new { @class = "form-label" })
+            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Enter Email" , required = "required" })
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Security Question", htmlAttributes: new { @class = "form-label" })
+            <select name="SecurityQuestion" class="form-control">
+                <option value="">-- Select a question --</option>
+                <option value="Your childhood nickname?">Your childhood nickname?</option>
+                <option value="Your favorite teacher’s name?">Your favorite teacher’s name?</option>
+                <option value="Your best friend's first name?">Your best friend's first name?</option>
+                <option value="Your birthplace?">Your birthplace?</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Security Answer", htmlAttributes: new { @class = "form-label" })
+            <input type="text" name="SecurityAnswer" class="form-control" placeholder="Answer your selected question" required />
+        </div>
+        <div class="mt-3">
+
+            <button type="submit" class="btn btn-primary">Register</button>
+        </div>
+    </div>
+            }
+
+            @if (ViewBag.Message != null)
+            {
+              <h3>  <p style="color: blue">@ViewBag.Message</p></h3>
+            }

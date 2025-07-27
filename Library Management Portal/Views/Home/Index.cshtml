@@ -1,0 +1,63 @@
+﻿@{
+    ViewBag.Title = "Library Home";
+}
+@section Styles
+{
+    <style>
+        .background {
+            background-image: url('/Content/Images/Background.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            height: 10vh;
+        }
+    </style>
+    
+}
+<div class="container mt-4">
+
+    <div class="jumbotron bg-light p-4 rounded">
+        <h1 class="display-5">Welcome to Our Library</h1>
+        <p class="lead">Where Every Book Finds You. A Book for Every Curiosity.Find Yourself in a Book. Knowledge is Just a Page Away. Discover ..</p>
+
+    </div>
+
+    <!--<div class="background">
+        <img src="@Url.Content("~/Content/Images/Background.jpg")" class="img-fluid" alt="Banner" />-->
+
+        <!-- Your content here -->
+    <!--</div>-->
+
+    <div class="row text-center mt-5">
+       
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">View Book List</h5>
+                        <p class="card-text">Expand your catalog by adding fresh titles.</p>
+                        <a href="/Master/BookList" class="btn btn-outline-success">View Books</a>
+                    </div>
+                </div>
+            
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Manage Members</h5>
+                        <p class="card-text">Update member info and check active users.</p>
+                        <a href="/Master/MemberList" class="btn btn-outline-info">View Members</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">View Issue/Return Book</h5>
+                        <p class="card-text">View Books which Issued and Retrun From their</p>
+                        <a href="/Transaction/ShowBookTrans" class="btn btn-outline-warning">View Issue/Return Book</a>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>

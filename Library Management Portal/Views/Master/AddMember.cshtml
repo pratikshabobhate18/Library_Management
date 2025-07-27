@@ -1,0 +1,99 @@
+﻿
+@{
+    ViewBag.Title = "Members";
+}
+
+
+
+<form>
+    <div class="form-border">
+        <h2>Add Member Here !!!</h2>
+        @*@using (Html.BeginForm("BookList", "Master", FormMethod.Post))
+        {*@
+        @*@using (Html.BeginForm("Books", "Master", FormMethod.Post, new { id = "bookform" }))
+        {*@
+        <input type="hidden" id="BookId" value="1" name="MemberId" />
+
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" class="form-control" id="fullName" name="fullName" required />
+            <div class="invalid-feedback">Name is required.</div>
+        </div>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input type="text" class="form-control" id="email" name="email" required />
+            <div class="invalid-feedback">Email is required.</div>
+        </div>
+        <div class="form-group">
+            <label>Contact No</label>
+            <input type="text" class="form-control" id="contact" name="contact" required />
+            <div class="invalid-feedback">Contact is required.</div>
+        </div>
+
+
+
+        <button type="submit" class="btn btn-primary" id="btnMember" name="btnMember">Save</button>
+        @*}*@
+    </div>
+</form>
+
+<div id="MemberAlert" class="mt-2"></div>
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+            /*  $("#").on("submit", function (e) {*/
+            $('#btnMember').on('click', function () {
+               // console.log("In");
+                //e.preventDefault();
+                //let form = this;
+
+                //if (!form.checkValidity()) {
+                //    e.stopPropagation();
+                //    $(form).addClass("was-validated");
+                //    return;
+                //}
+
+                //var formData = $(this).serialize();
+                //console.log(formData);
+                $.ajax({
+                    type: "POST",
+                    url: "https://localhost:7035/Member",
+                    contentType: "application/json",
+                    data: JSON.stringify({
+
+                        FullName: $("#fullName").val(),
+                        Email: $("#email").val(),
+                        ContactNo: $("#contact").val()
+
+                    }),
+
+
+                    complete: function (data) {
+                        console.log("In");
+                        $.ajax({
+
+                            url: "/Master/memberList", // Second controller method
+                            type: "GET",
+                            contentType: "application/json",
+                            data: JSON.stringify(memberData), // Pass same or modified data
+                            success: function () {
+                                alert("Notification sent!");
+                            },
+                            error: function () {
+                                alert("Error in Notify method.");
+                            }
+                        });
+                    },
+
+
+                    error: function (xhr) {
+                        //console.log(data);
+                        $("#memberAlert").html(`<div class="alert alert-danger">${xhr.responseText}</div>`);
+                    }
+                });
+            });
+        });
+    </script>
+}

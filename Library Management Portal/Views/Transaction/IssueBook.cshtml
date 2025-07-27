@@ -1,0 +1,172 @@
+﻿@model Library_Management_Portal.Models.BookIssue
+
+@{
+    ViewData["Title"] = "Issue Book";
+}
+
+
+
+<form asp-action="IssueBook" method="post" class="form-horizontal">
+    <div class="form-border">
+        <h2>Issue Book</h2>
+        <div class="form-group">
+            <label asp-for="BookId" class="control-label"></label>
+            <input asp-for="BookId" id="bookSearchBox" placeholder="Search books..." autocomplete="off" class="form-control" />
+            <span asp-validation-for="BookId" class="text-danger"></span>
+            <div id="bookSuggestionsBox" class="list-group"></div>
+            <input type="hidden" id="selectedBookId" />
+
+
+        </div>
+
+        <div class="form-group">
+            <label asp-for="MemberId" class="control-label"></label>
+            <input asp-for="MemberId" id="memberSearchBox" placeholder="Search members..." autocomplete="off" class="form-control" />
+            <div id="memberSuggestionsBox" class="list-group"></div>
+            <span asp-validation-for="MemberId" class="text-danger"></span>
+            <input type="hidden" id="selectedMemberId" />
+
+        </div>
+
+        <div class="form-group">
+            <label asp-for="IssueDate" class="control-label"></label>
+            <input asp-for="IssueDate" id="IssueDate" name="IssueDate" class="form-control" type="date" />
+            <span asp-validation-for="IssueDate" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="DueDate" class="control-label"></label>
+            <input asp-for="DueDate" id="DueDate" name="DueDate" class="form-control" type="date" readonly disabled />
+            <span asp-validation-for="DueDate" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mt-3">
+            <input type="submit" id="Issuebook" name="Issuebook" value="Issue Book" class="btn btn-success" />
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+  <script>
+      $(document).ready(function () {
+
+          $('#IssueDate').on('change', function () {
+           
+              const enteredDateStr = $(this).val();
+
+              if (!enteredDateStr) {
+                  $('#DueDate').val('');
+                  return;
+              }
+
+              const enteredDate = new Date(enteredDateStr);
+              enteredDate.setDate(enteredDate.getDate() + 7); 
+
+              const dueDateStr = enteredDate.toISOString().split('T')[0]; 
+              $('#DueDate').val(dueDateStr);
+          });
+
+          let allBooks = [];
+          let allMembers = [];
+
+          // Load books
+          $.ajax({
+              url: 'https://localhost:7035/Book',
+              type: 'GET',
+              success: function (data) {
+                  allBooks = data;
+              }
+          });
+
+          // Load members
+          $.ajax({
+              url: 'https://localhost:7035/Member',
+              type: 'GET',
+              success: function (data) {
+                  allMembers = data;
+              }
+          });
+
+          // Book search filter
+          $('#bookSearchBox').on('input', function () {
+              const query = $(this).val().toLowerCase();
+
+              if (query.length > 0) {
+                  const filtered = allBooks.filter(book =>
+                      book.title.toLowerCase().includes(query)
+                  );
+
+                  const suggestions = filtered.map(book =>
+                      `<button type="button" class="list-group-item list-group-item-action"  data-id="${book.id}">${book.title}</button>`
+                  ).join('');
+
+                  $('#bookSuggestionsBox').html(suggestions).show();
+              } else {
+                  $('#bookSuggestionsBox').hide();
+              }
+          });
+
+         
+          $('#memberSearchBox').on('input', function () {
+              const query = $(this).val().toLowerCase();
+
+              if (query.length > 0) {
+                  const filtered = allMembers.filter(member =>
+                      member.fullName.toLowerCase().includes(query)
+                  );
+
+                  const suggestions = filtered.map(member =>
+                      `<button type="button" class="list-group-item list-group-item-action" data-id="${member.memberId}">${member.fullName}</button>`
+                  ).join('');
+
+                  $('#memberSuggestionsBox').html(suggestions).show();
+              } else {
+                  $('#memberSuggestionsBox').hide();
+              }
+          });
+
+          $(document).on('click', '#bookSuggestionsBox button', function () {
+              $('#bookSearchBox').val($(this).text());
+              $('#selectedBookId').val($(this).data('id'));
+              //console.log($(this).data('id'));
+              $('#bookSuggestionsBox').hide();
+          });
+
+          $(document).on('click', '#memberSuggestionsBox button', function () {
+              $('#memberSearchBox').val($(this).text());
+              $('#selectedMemberId').val($(this).data('id')); 
+              //console.log($(this).data());
+              $('#memberSuggestionsBox').hide();
+          });
+          console.log($("#IssueDate").val());
+          $('#Issuebook').on('click', function () {
+              console.log("In");
+              $.ajax({
+                  type: "POST",
+                  url: "https://localhost:7035/Transaction",
+                  contentType: "application/json",
+                  data: JSON.stringify({
+
+                    //  IssueId:$("#MemberId").val(),
+                      BookId: $("#selectedBookId").val(),
+                      MemberId: $("#selectedMemberId").val(),
+                      issueDate: $("#IssueDate").val(),
+                      dueDate: $("#DueDate").val()
+                     
+                  }),
+
+
+                  success: function (data) {
+                      alert("Book Issued Successfully please return before  " + data.dueDate);
+                  },
+
+
+                  error: function (xhr) {
+                      //console.log(data);
+                      $("#bookAlert").html(`<div class="alert alert-danger">${xhr.responseText}</div>`);
+                  }
+              });
+          });
+      });
+    </script>
+}

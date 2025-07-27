@@ -1,0 +1,141 @@
+﻿
+@{
+    ViewBag.Title = "ReturnBook";
+}
+@model Library_Management_Portal.Models.ReturnFetchModel
+
+
+
+
+<form asp-action="IssueBook" method="post" class="form-horizontal">
+    <div class="form-border">
+        <div class="form-group">
+            <h2>Return Book</h2>
+            <label asp-for="IssueId" class="control-label"></label>
+            <input asp-for="IssueId" id="IssueId" name="IssueId" value="@ViewData["Id"]" class="form-control" />
+        </div>
+        <input type="hidden" id="selectedBookId" name="selectedIssueId" />
+
+        <div class="form-group">
+            <label asp-for="BookId" class="control-label"></label>
+            <input asp-for="BookId" id="title" name="title" autocomplete="off" class="form-control" />
+            <span asp-validation-for="BookId" class="text-danger"></span>
+
+        </div>
+
+        <div class="form-group">
+            <label asp-for="MemberId" class="control-label"></label>
+            <input asp-for="MemberId" id="name" name="name" autocomplete="off" class="form-control" />
+
+            <span asp-validation-for="MemberId" class="text-danger"></span>
+
+
+        </div>
+
+
+
+        <div class="form-group">
+            <label asp-for="DueDate" class="control-label"></label>
+            <input asp-for="DueDate" id="DueDate" name="DueDate" class="form-control" type="date" readonly disabled />
+            <span asp-validation-for="DueDate" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="CurrDate" class="control-label"></label>
+            <input asp-for="CurrDate" id="CurrDate" name="CurrDate" class="form-control" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+            <span asp-validation-for="CurrDate" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mt-2">
+            <input type="submit" id="btnreturnBook" name="btnreturnBook" value="Return Book" class="btn btn-success" />
+        </div>
+
+        <div id="fineMessage" style="color: red;"></div>
+</div>
+</form>
+
+@section Scripts {
+    <script>
+        //let timer;
+
+        $(document).ready(function () {
+          /*  $('#IssueId').keyup(function () {*/
+               // clearTimeout(timer);
+
+                // var id = $(this).val();
+
+                var id = $('#IssueId').val();
+               
+                $.ajax({
+                    url: `https://localhost:7035/Transaction/${id}`,
+                    type: 'GET',
+                    success: function (data) {
+                        console.log(data);
+                      
+                        $('#title').val(data.title),
+                            $('#name').val(data.name),
+                             date = new Date(data.dueDate);
+                         formattedDate = date.toISOString().split('T')[0]; 
+                        $('#DueDate').val(formattedDate);
+                        
+                        $('#selectedBookId').val(data.bookId);
+                       // BookId = data.BookId;
+                        let CurrDate = new Date(document.getElementById('CurrDate').value);
+                        let dueDate = new Date(document.getElementById('DueDate').value);
+                
+                        let diffMs = CurrDate-dueDate;
+
+                        let diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+                        if (diffDays > 10) {
+                          
+                            document.getElementById('fineMessage').textContent = 'Book returned late.... You have to pay 30 Rs. Fine.';
+
+                        }
+                            //$('#DueDate').val(data.dueDate);
+
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Error loading data: ' + error);
+                    }
+                });
+
+           /* });*/
+
+
+           
+          
+            $('#btnreturnBook').on('click', function (e) {
+                e.preventDefault();
+                var id = $('#selectedBookId').val();
+                
+                var updatedData = {
+                     BookId: $('#selectedBookId').val(),
+                    //FullName: $('#fullName').val(),
+                    //Email: $('#email').val(),
+                    //ContactNo: $('#contact').val()
+
+                };
+
+                $.ajax({
+
+                    url: `https://localhost:7035/Transaction/${id}`,
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(updatedData),
+                    success: function (response) {
+                      alert('Book Return successfully!');
+                     
+                  },
+
+
+
+                  error: function (xhr) {
+                      //console.log(data);
+                      $("#bookAlert").html(`<div class="alert alert-danger">${xhr.responseText}</div>`);
+                  }
+              });
+          });
+      });
+    </script>
+}

@@ -1,0 +1,121 @@
+﻿
+@{
+    ViewBag.Title = "Update";
+}
+<form asp-action="Books" asp-controller="Master" method="post">
+    <div class="form-border">
+        <h2>Update Here !!!</h2>
+        <input type="hidden" disabled="disabled" id="BookId" value="@ViewData["Id"]" name="BookId" />
+
+        <div class="form-group mt-2">
+            <label>Title</label>
+            <input type="text" class="form-control" id="Title" name="Title" required />
+            <div class="invalid-feedback">Title is required.</div>
+        </div>
+
+        <div class="form-group">
+            <label>Author</label>
+            <input type="text" class="form-control" id="Author" name="Author" required />
+            <div class="invalid-feedback">Author is required.</div>
+        </div>
+        <div class="form-group">
+            <label for="Category">Category</label>
+            <select id="Category" name="Category" class="form-control">
+                <option value="General">General</option>
+                <option value="Fiction">Fiction</option>
+                <option value="Science">Science</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>ISBN</label>
+            <input type="text" class="form-control" name="ISBN" Id="ISBN" placeholder="Enter 13 digit No" pattern="\d{13}" />
+            <div class="invalid-feedback">Enter a valid 13-digit ISBN.</div>
+        </div>
+
+
+        <div class="form-group">
+            <label>Total Copies</label>
+            <input type="text" class="form-control" id="totalCopies" name="totalCopies" required min="1" />
+            <div class="invalid-feedback">Stock is required.</div>
+        </div>
+
+        <div class="form-group">
+            <label>Available Copies</label>
+            <input type="text" class="form-control" id="Stock" name="Stock" required />
+            <div class="invalid-feedback">Stock is required.</div>
+        </div>
+        <div class="mt-3">
+            @*@Html.ActionLink("Update", "BookList", "Master", null, new { @class = "btn btn-success" })*@
+            <button type="submit" name="btnUpd" id="btnUpd" class="btn btn-primary">Update</button>
+        </div>
+    </div>
+</form>
+    @section Scripts {
+
+        <script>
+            $(document).ready(function () {
+               
+
+                $('#totalCopies').on('input', function () {
+                    console.log($(this).val());
+                    var value = $(this).val();
+                    $('#Stock').val(value);
+                });
+                var id = $('#BookId').val();
+                console.log(id);
+                $.ajax({
+                    url: `https://localhost:7035/Book/${id}`,
+                    type: 'GET',
+                    success: function (data) {
+                        console.log(data);
+                        $('#Title').val(data.title),
+                            $('#Author').val(data.author),
+                            $('#Stock').val(data.stock),
+                            $('#totalCopies').val(data.totalCopies),
+                            $('#ISBN').val(data.isbn),
+                            $('#Category').val(data.category)
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Error loading data: ' + error);
+                    }
+                });
+
+
+                $('#btnUpd').on('click', function (e) {
+                    
+
+                    e.preventDefault();
+                    console.log("book id" + $('#BookId').val());
+                    var updatedData = {
+                        id: $('#BookId').val(),
+                        Title: $('#Title').val(),
+                        Author: $('#Author').val(),
+                        Stock: $('#stock').val(),
+                        ISBN: $('#ISBN').val(),
+                        totalCopies: $('#totalCopies').val(),
+                        Category: $('#Category').val()
+                      
+                    };
+
+                    $.ajax({
+
+                        url: `https://localhost:7035/Book/${id}`,
+                        type: 'PUT',
+                        contentType: 'application/json',
+                        data: JSON.stringify(updatedData),
+                        success: function () {
+                            alert('Book updated successfully!');
+                           
+                        },
+                        error: function (xhr, status, error) {
+                            alert('Update failed: ' + error);
+                        }
+                    });
+                });
+            });
+
+
+
+        </script>
+    }

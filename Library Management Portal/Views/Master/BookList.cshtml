@@ -1,0 +1,128 @@
+﻿
+@{
+    ViewBag.Title = "BookList";
+}
+
+<h2>Check Collection Of Books</h2>
+<div>
+    @*<a asp-controller="Master" asp-action="Books" class="btn btn-success">Add new</a>*@
+    @Html.ActionLink("Add new", "Books", "Master", null, new { @class = "btn btn-success" })
+
+</div>
+<div class="container mt-3">
+    <div id="bookTable" class="table-responsive">
+
+    </div>
+</div>
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+        //jQuery.validator.addMethod("isbnNo", function (value, element) {
+        //    let isbn = value.replace(/[^0-9X]/gi, '');
+        //    if (isbn.length === 10) {
+        //        // ISBN-10 validation
+        //        let sum = 0;
+        //        for (let i = 0; i < 9; i++) {
+        //            sum += (10 - i) * parseInt(isbn.charAt(i));
+        //        }
+        //        let check = isbn.charAt(9).toUpperCase();
+        //        sum += (check === 'X') ? 10 : parseInt(check);
+        //        return (sum % 11 === 0);
+        //    } else if (isbn.length === 13) {
+        //        // ISBN-13 validation
+        //        let sum = 0;
+        //        for (let i = 0; i < 12; i++) {
+        //            sum += parseInt(isbn.charAt(i)) * (i % 2 === 0 ? 1 : 3);
+        //        }
+        //        let check = (10 - (sum % 10)) % 10;
+        //        return check === parseInt(isbn.charAt(12));
+        //    }
+        //    return false;
+        //}, "Please enter a valid ISBN number.");
+       
+            $.ajax({
+                url: "https://localhost:7035/Book", 
+                type: "GET",
+                dataType: "json",
+                success: function (response) {
+                    console.log("In");
+                    let html = `
+        <table class='table table-bordered'>
+          <thead>
+            <tr class="table-primary">
+             <th>Id</th>
+              <th>Title</th>
+              <th>Author</th>
+               <th>ISBN</th>
+               <th>Available Copies</th>
+               <th>Total Copies</th>             
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+                    response.forEach(book => {
+                        html += `
+          <tr>
+           <td class="table-danger">${book.id}</td>
+            <td class="table-secondary">${book.title}</td>
+            <td class="table-success">${book.author}</td>
+            <td class="table-danger">${book.isbn}</td>             
+            <td class="table-warning">${book.stock}</td>
+            <td class="table-info">${book.totalCopies}</td>
+             
+            <td class="table-light">
+              <button class="btn btn-sm btn-outline-primary" data-id="${book.id}"><i class="bi bi-pencil-square"></i></button>
+           
+              <button class="btn btn-sm btn-danger delete-btn" data-id="${book.id}"><i class="bi bi-trash"></i></button>
+            </td>
+          </tr>
+        `;
+                    });
+
+                    html += `
+          </tbody>
+        </table>
+      `;
+
+                    $("#bookTable").html(html);
+
+                  
+                    $(".btn-outline-primary").click(function () {
+                        const id = $(this).data("id");
+                        //alert("Edit book with ID: " + id);
+                        window.location.href = '/Master/Update/?Id=' + id 
+                       
+                    });
+
+                    $(".delete-btn").click(function () {
+                       
+                        const id = $(this).data("id");
+                        console.log(id);
+                        if (confirm("Are you sure you want to delete this book?")) {
+                            $.ajax({
+                                url: `https://localhost:7035/Book/${id}`,
+                                type: "DELETE",
+                                success: function () {
+                                    alert("Book deleted successfully.");
+                                    location.reload(); 
+                                },
+                                error: function () {
+                                    alert("Error deleting book.");
+                                }
+                            });
+                        }
+                    });
+                },
+                error: function (xhr) {
+                    $("#bookTable").html(`<p class='text-danger'>Something Went Wrong..Try Again!!: ${xhr.responseText}</p>`);
+                }
+            });
+        });
+    </script>
+}
+
+

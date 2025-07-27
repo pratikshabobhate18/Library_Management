@@ -1,0 +1,136 @@
+﻿
+@{
+    ViewBag.Title = "Books";
+}
+
+
+
+
+
+<form>
+    @*@using (Html.BeginForm("BookList", "Master", FormMethod.Post))
+        {*@
+    @*@using (Html.BeginForm("Books", "Master", FormMethod.Post, new { id = "bookform" }))
+        {*@
+    <div class="form-border">
+        <h2 class="mb-2">Add Book Here !!</h2>
+        <input type="hidden" id="BookId" value="1" name="BookId" />
+
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" class="form-control" id="Title" name="Title" required />
+            <div class="invalid-feedback">Title is required.</div>
+        </div>
+
+        <div class="form-group">
+            <label>Author</label>
+            <input type="text" class="form-control" id="Author" name="Author" required />
+            <div class="invalid-feedback">Author is required.</div>
+        </div>
+
+        <div class="form-group">
+            <label for="Category">Category</label>
+            <select id="Category" name="Category" class="form-control">
+                <option value="General">General</option>
+                <option value="Fiction">Fiction</option>
+                <option value="Science">Science</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>ISBN</label>
+            <input type="text" class="form-control" name="ISBN" Id="ISBN" placeholder="Enter 13 digit No" pattern="\d{13}" />
+            <div class="invalid-feedback">Enter a valid 13-digit ISBN.</div>
+        </div>
+
+        @*<div class="form-group">
+            <label>Total Copies</label>
+            <input type="number" class="form-control" name="TotalCopies" required min="1" />
+            <div class="invalid-feedback">Total copies must be at least 1.</div>
+        </div>*@
+        <div class="form-group">
+            <label>Total Copies</label>
+            <input type="text" class="form-control" id="totalCopies" name="totalCopies" required min="1" />
+            <div class="invalid-feedback">Stock is required.</div>
+        </div>
+
+        <div class="form-group">
+            <label>Available Copies</label>
+            <input type="number" class="form-control" name="Stock" id="Stock"  required min="0" readonly />
+            <div class="invalid-feedback">Available copies must be 0 or more.</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3" id="bookForm" name="bookForm">Save</button>
+        @*}*@
+    </div>
+</form>
+
+<div id="bookAlert" class="mt-2"></div>
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+            /*  $("#").on("submit", function (e) {*/
+            $('#totalCopies').on('input', function () {
+                console.log($(this).val());
+                var value = $(this).val();
+                $('#Stock').val(value);
+            });
+
+            $('#bookForm').on('click', function () {
+                // console.log("In");
+                //e.preventDefault();
+                //let form = this;
+
+                //if (!form.checkValidity()) {
+                //    e.stopPropagation();
+                //    $(form).addClass("was-validated");
+                //    return;
+                //}
+
+                //var formData = $(this).serialize();
+               
+                $.ajax({
+                    type: "POST",
+                    url: "https://localhost:7035/Book",
+                    contentType: "application/json",
+                    data: JSON.stringify({
+
+                        Title: $("#Title").val(),
+                        Author: $("#Author").val(),
+                        Stock: $("#Stock").val(),
+                        ISBN: $("#ISBN").val(),
+                        Category: $('#Category option:selected').text(),//$('#Category').val(),
+                        totalCopies: $("#totalCopies").val()
+
+                    }),
+
+
+                    success: function () {
+                        alert("Book is Added Successfully");
+                        $.ajax({
+
+                            url: "/Master/BookList",
+                            type: "GET",
+                            contentType: "application/json",
+                            data: JSON.stringify(bookData),
+                            success: function () {
+                                alert("Notification sent!");
+                            },
+                            error: function () {
+                                alert("Error in Notify method.");
+                            }
+                        });
+                    },
+
+
+                    error: function (xhr) {
+                        alert("Error in Notify method.");
+                        //console.log(data);
+                        $("#bookAlert").html(`<div class="alert alert-danger">${xhr.responseText}</div>`);
+                    }
+                });
+            });
+        });
+    </script>
+}

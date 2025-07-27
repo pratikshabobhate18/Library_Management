@@ -1,0 +1,78 @@
+﻿
+@{
+    ViewBag.Title = "AddBook";
+}
+
+@model Library_Management_Portal.Models.AddBook
+
+@{
+    ViewBag.Title = "Book Master";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>📚 Book Master</h2>
+
+
+@using (Html.BeginForm("Save", "Book", FormMethod.Post))
+{
+    <div class="form-border">
+
+        <div class="form-horizontal">
+            <h4>Add / Edit Book</h4>
+            <hr />
+
+            @*@Html.HiddenFor(model => books.BookId)*@
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.Title, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Author, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.Author, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Author, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
+            </div>
+        </div>
+        </div>
+        }
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @*If(@model!="")
+                    @foreach (var book in ViewBag.BookList as List<Library_Management_Portal.Models.AddBook>)
+                    {
+                        <tr>
+                            <td>@book.Title</td>
+                            <td>@book.Author</td>
+
+                            <td>
+                                @Html.ActionLink("Edit", "Edit", new { id = book.BookId }) |
+                                @Html.ActionLink("Delete", "Delete", new { id = book.BookId })
+                            </td>
+                        </tr>
+                    }*@
+            </tbody>
+        </table>
+
+

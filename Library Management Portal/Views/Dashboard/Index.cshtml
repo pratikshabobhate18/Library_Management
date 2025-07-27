@@ -1,0 +1,91 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Graphical Represantation</h2>
+<div style="display: flex; gap: 40px; flex-wrap: wrap;">
+    <div>
+        <h3>Book Issues (Last 7 Days)</h3>
+        <canvas id="barChart" width="500" height="300"></canvas>
+    </div>
+
+    <div>
+        <h3>Issue Percentage by Category</h3>
+        <canvas id="pieChart" width="300" height="300"></canvas>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        $(document).ready(function () {
+            // BAR CHART - Books issued over 7 days
+            $.getJSON('/Dashboard/GetBookIssues', function (barData) {
+                const barLabels = barData.map(item => item.date);
+                const barValues = barData.map(item => item.count);
+
+                const ctxBar = document.getElementById('barChart').getContext('2d');
+                new Chart(ctxBar, {
+                    type: 'bar',
+                    data: {
+                        labels: barLabels,
+                        datasets: [{
+                            label: 'Books Issued',
+                            data: barValues,
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: { beginAtZero: true },
+                            x: { title: { display: true, text: 'Date' } }
+                        }
+                    }
+                });
+            });
+
+            // PIE CHART - Category percentages
+            $.getJSON('/Dashboard/GetCategoryBreakdown', function (pieData) {
+                const pieLabels = pieData.map(item => item.category);
+                const pieValues = pieData.map(item => item.count);
+
+                const ctxPie = document.getElementById('pieChart').getContext('2d');
+                new Chart(ctxPie, {
+                    type: 'pie',
+                    data: {
+                        labels: pieLabels,
+                        datasets: [{
+                            label: 'Books by Category',
+                            data: pieValues,
+                            backgroundColor: [
+                                '#FF6384', '#36A2EB', '#FFCE56', '#8E44AD', '#2ECC71', '#E67E22'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (ctx) {
+                                        const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                        const val = ctx.raw;
+                                        const pct = ((val / total) * 100).toFixed(1);
+                                        return `${ctx.label}: ${val} (${pct}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}

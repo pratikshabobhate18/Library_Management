@@ -1,0 +1,100 @@
+﻿
+@{
+    ViewBag.Title = "BookList";
+}
+
+<h2>BookList</h2>
+<div>
+    @*<a asp-controller="Master" asp-action="Books" class="btn btn-success">Add new</a>*@
+    @Html.ActionLink("Issue Book", "IssueBook", "Transaction", null, new { @class = "btn btn-success" })
+
+</div>
+<div class="container mt-3">
+    <div id="bookTable" class="table-responsive">
+
+    </div>
+</div>
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: "https://localhost:7035/Transaction", 
+                type: "GET",
+                dataType: "json",
+                success: function (response) {
+                    console.log(response);
+                    let html = `
+        <table class='table table-bordered'>
+          <thead>
+            <tr class="table-secondary">
+             <th>Id</th>
+              <th>Title</th>
+              <th>Member Name</th>
+                <th>Due Date</th>
+            
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+                    response.forEach(tran => {
+                        html += `
+          <tr>
+           <td class="table-danger">${tran.id}</td>
+            <td class="table-primary">${tran.title}</td>
+            <td class="table-warning">${tran.name}</td>
+            <td class="table-info">${tran.dueDate}</td>
+           
+            <td>
+              <button class="btn btn-sm btn-warning edit-btn" data-id="${tran.id}">Return book</button>             
+            </td>
+          </tr>
+        `;
+                    });
+
+                    html += `
+          </tbody>
+        </table>
+      `;
+
+                    $("#bookTable").html(html);
+
+                 
+                    $(".edit-btn").click(function () {
+                        const id = $(this).data("id");
+                     
+                        window.location.href = '/Transaction/ReturnBook/?Id=' + id
+                       
+                    });
+
+                //    $(".delete-btn").click(function () {
+
+                //        const id = $(this).data("id");
+                //        console.log(id);
+                //        if (confirm("Are you sure you want to delete this book?")) {
+                //            $.ajax({
+                //                url: `https://localhost:7035/Book/${id}`,
+                //                type: "DELETE",
+                //                success: function () {
+                //                    alert("Book deleted successfully.");
+                //                    location.reload(); // Or re-fetch the table
+                //                },
+                //                error: function () {
+                //                    alert("Error deleting book.");
+                //                }
+                //            });
+                //        }
+                //    });
+                },
+                error: function (xhr) {
+                    $("#bookTable").html(`<p class='text-danger'>Error loading data: ${xhr.responseText}</p>`);
+                }
+            });
+        });
+    </script>
+}
+
+
